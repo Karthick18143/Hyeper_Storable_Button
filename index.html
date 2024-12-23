@@ -5,26 +5,44 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Username List</title>
     <style>
+        :root {
+            --light-bg: #f0f0f0;
+            --light-text: #000;
+            --light-container: #fff;
+            --light-border: #ccc;
+
+            --dark-bg: #121212;
+            --dark-text: #fff;
+            --dark-container: #1e1e1e;
+            --dark-border: #444;
+        }
+
         body {
             font-family: Arial, sans-serif;
             margin: 20px;
             padding: 20px;
-            background-color: #f0f0f0;
+            background-color: var(--light-bg);
+            color: var(--light-text);
+            transition: background-color 0.3s, color 0.3s;
         }
         .container {
             max-width: 400px;
             margin: auto;
             padding: 20px;
-            background: #fff;
+            background: var(--light-container);
             border-radius: 10px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.3s;
         }
         input[type="text"] {
             width: calc(100% - 10px);
             padding: 10px;
             margin-bottom: 10px;
-            border: 1px solid #ccc;
+            border: 1px solid var(--light-border);
             border-radius: 5px;
+            background-color: var(--light-container);
+            color: var(--light-text);
+            transition: background-color 0.3s, color 0.3s, border-color 0.3s;
         }
         button {
             padding: 10px 20px;
@@ -33,6 +51,7 @@
             border: none;
             border-radius: 5px;
             cursor: pointer;
+            transition: background-color 0.3s;
         }
         button:hover {
             background-color: #218838;
@@ -40,19 +59,45 @@
         ol {
             margin-top: 20px;
         }
+
+        body.dark-mode {
+            background-color: var(--dark-bg);
+            color: var(--dark-text);
+        }
+        body.dark-mode .container {
+            background-color: var(--dark-container);
+        }
+        body.dark-mode input[type="text"] {
+            background-color: var(--dark-container);
+            color: var(--dark-text);
+            border-color: var(--dark-border);
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <h2>Username List</h2>
+        <button onclick="toggleDarkMode()">Toggle Dark Mode</button>
         <input type="text" id="usernameInput" placeholder="Enter username" onkeypress="handleKeyPress(event)" />
         <button onclick="addUsername()">Add</button>
         <ol id="usernameList"></ol>
     </div>
 
     <script>
-        // Load saved usernames from local storage when the page loads
+        // Toggle dark mode
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark-mode');
+            const isDarkMode = document.body.classList.contains('dark-mode');
+            localStorage.setItem('darkMode', isDarkMode);
+        }
+
+        // Load saved dark mode preference
         document.addEventListener('DOMContentLoaded', () => {
+            const savedDarkMode = localStorage.getItem('darkMode') === 'true';
+            if (savedDarkMode) {
+                document.body.classList.add('dark-mode');
+            }
+
             const savedUsernames = JSON.parse(localStorage.getItem('usernames')) || [];
             const list = document.getElementById('usernameList');
 
