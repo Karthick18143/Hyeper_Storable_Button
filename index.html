@@ -19,6 +19,7 @@
             background-color: var(--dark-bg);
             color: var(--dark-text);
         }
+
         .container {
             max-width: 400px;
             margin: auto;
@@ -27,6 +28,7 @@
             border-radius: 10px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
         }
+
         input[type="text"] {
             width: calc(100% - 10px);
             padding: 10px;
@@ -36,6 +38,7 @@
             background-color: var(--dark-container);
             color: var(--dark-text);
         }
+
         button {
             padding: 10px 20px;
             background-color: #28a745;
@@ -44,9 +47,11 @@
             border-radius: 5px;
             cursor: pointer;
         }
+
         button:hover {
             background-color: #218838;
         }
+
         ol {
             margin-top: 20px;
         }
@@ -61,39 +66,57 @@
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const savedUsernames = JSON.parse(localStorage.getItem('usernames')) || [];
-            const list = document.getElementById('usernameList');
+        const API_URL = 'https://your-server-url/api/usernames'; // Replace with your server endpoint
 
-            savedUsernames.forEach(username => {
-                const listItem = document.createElement('li');
-                listItem.textContent = username;
-                list.appendChild(listItem);
-            });
+        // Fetch usernames from the server when the page loads
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                const response = await fetch(API_URL);
+                const usernames = await response.json();
+
+                const list = document.getElementById('usernameList');
+                usernames.forEach(username => {
+                    const listItem = document.createElement('li');
+                    listItem.textContent = username;
+                    list.appendChild(listItem);
+                });
+            } catch (error) {
+                console.error('Error fetching usernames:', error);
+            }
         });
 
-        function addUsername() {
+        // Add a username to the server
+        async function addUsername() {
             const input = document.getElementById('usernameInput');
             const username = input.value.trim();
 
             if (username) {
-                const list = document.getElementById('usernameList');
+                try {
+                    const response = await fetch(API_URL, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ username })
+                    });
 
-                // Create a new list item
-                const listItem = document.createElement('li');
-                listItem.textContent = username;
-                list.appendChild(listItem);
+                    if (response.ok) {
+                        const list = document.getElementById('usernameList');
+                        const listItem = document.createElement('li');
+                        listItem.textContent = username;
+                        list.appendChild(listItem);
 
-                // Save to local storage
-                const savedUsernames = JSON.parse(localStorage.getItem('usernames')) || [];
-                savedUsernames.push(username);
-                localStorage.setItem('usernames', JSON.stringify(savedUsernames));
-
-                // Clear the input field
-                input.value = '';
+                        input.value = '';
+                    } else {
+                        console.error('Error adding username:', response.statusText);
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                }
             }
         }
 
+        // Handle pressing Enter
         function handleKeyPress(event) {
             if (event.key === 'Enter') {
                 addUsername();
